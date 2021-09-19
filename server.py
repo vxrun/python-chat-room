@@ -29,3 +29,24 @@ def handle(client):
             nickname = nicknames[index]
             nicknames.remove(nickname)
             broadcast(f'{nickname} left the chat'.encode('ascii'))
+
+
+def receive():
+    while True:
+        client, address = server.accept()
+        print(f'connected! with {str(address)}')
+
+        client.send('NICK'.encode('ascii'))
+        nickname = client.recv(1024).decode('ascii')
+        clients.append(client)
+
+        print(f'Nickname of Client is {nickname}')
+        broadcast(f'{nickname} joined the chat! '.encode('ascii'))
+        client.send(f'Connected to the server! '.encode('ascii'))
+
+        thread = threading.Thread(target=handle, args=(client,))
+        thread.start()
+
+
+print("Server is listening !")
+receive()
